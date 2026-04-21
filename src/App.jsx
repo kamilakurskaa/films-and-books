@@ -3,6 +3,7 @@ import { createAssistant, createSmartappDebugger } from '@salutejs/client';
 
 import './App.css';
 import { MediaList } from './pages/MediaList';
+import { WelcomeScreen } from './components/WelcomeScreen';
 
 const initializeAssistant = (getState, getRecoveryState) => {
   if (process.env.NODE_ENV === 'development') {
@@ -24,35 +25,41 @@ const initializeAssistant = (getState, getRecoveryState) => {
 export class App extends React.Component {
   constructor(props) {
     super(props);
-    console.log('constructor');
-      const savedData = this.loadFromStorage();
+      console.log('constructor');
+
+      const savedBooks = this.loadFromStorage('media_tracker_books');
+      const savedMovies = this.loadFromStorage('media_tracker_movies');
       const savedSelectedId = localStorage.getItem('media_tracker_selected_id');
       const savedSelectedTitle = localStorage.getItem('media_tracker_selected_title');
 
       this.state = {
+          currentSection: null,  // <-- ДОБАВИТЬ: 'books', 'movies', или null
           selectedItemId: savedSelectedId || null,
           selectedItemTitle: savedSelectedTitle || null,
-          items: savedData.length > 0 ? savedData : [
-            {
-                id: '1',
-                title: 'Война и мир',
-                type: 'book',
-                rating: 5,
-                review: 'Шедевр',
-                date: '2026-01-15'
-            },
-            {
-                id: '2',
-                title: 'Твоё сердце будет разбито',
-                type: 'movie',
-                rating: 4,
-                review: 'Отличный сюжет',
-                date: '2026-05-15'
-            }
-        ],
-    };
+          books: savedBooks.length > 0 ? savedBooks : [
+              {
+                  id: '1',
+                  title: 'Война и мир',
+                  type: 'book',
+                  rating: 5,
+                  review: 'Шедевр',
+                  date: '2026-01-15'
+              }
+          ],
+          movies: savedMovies.length > 0 ? savedMovies : [
+              {
+                  id: '2',
+                  title: 'Твоё сердце будет разбито',
+                  type: 'movie',
+                  rating: 4,
+                  review: 'Отличный сюжет',
+                  date: '2026-05-15'
+              }
+          ],
+      };
 
-    this.assistant = initializeAssistant(() => this.getStateForAssistant());
+      this.assistant = initializeAssistant(() => this.getStateForAssistant());
+      window.assistant = this.assistant;
 
     this.assistant.on('data', (event) => {
       console.log(`assistant.on(data)`, event);
@@ -85,12 +92,12 @@ export class App extends React.Component {
     });
   }
 
-    loadFromStorage() {
+    loadFromStorage(key) {
         try {
-            const saved = localStorage.getItem('media_tracker_items');
+            const saved = localStorage.getItem(key);
             if (saved) {
                 const items = JSON.parse(saved);
-                console.log('Loaded from storage:', items.length, 'items');
+                console.log('Loaded from storage:', key, items.length, 'items');
                 return items;
             }
         } catch (error) {
@@ -99,7 +106,26 @@ export class App extends React.Component {
         return [];
     }
 
-    // Сохранение данных в localStorage
+
+    getCurrentItems() {
+        return this.state.currentSection === 'books' ? this.state.books : this.state.movies;
+    }
+
+    getCurrentStorageKey() {
+        return this.state.currentSection === 'books' ? 'media_tracker_books' : 'media_tracker_movies';
+    }
+
+    updateCurrentItems(newItems) {
+        const key = this.getCurrentStorageKey();
+        const stateField = this.state.currentSection === 'books' ? 'books' : 'movies';
+
+        this.setState({ [stateField]: newItems }, () => {
+            localStorage.setItem(key, JSON.stringify(newItems));
+            console.log('Saved to', key, ':', newItems.length, 'items');
+        });
+    }
+
+    /*// Сохранение данных в localStorage
     saveToStorage(items) {
         try {
             localStorage.setItem('media_tracker_items', JSON.stringify(items));
@@ -114,55 +140,56 @@ export class App extends React.Component {
         this.setState({ items: newItems }, () => {
             this.saveToStorage(this.state.items);
         });
-    }
+    }*/
 
-  clear_all_items = () => {
+    clear_all_items = () => {
         console.log('clear_all_items');
-        this.updateItemsAndSave([]);
+        this.updateCurrentItems([]);  // <-- ИСПОЛЬЗУЙТЕ updateCurrentItems
         this._send_action_value('clear_all', 'Все элементы удалены');
-  }
+    }
 
   componentDidMount() {
     console.log('componentDidMount');
   }
 
-  getStateForAssistant() {
-      console.log('getStateForAssistant: this.state:', this.state);
+    getStateForAssistant() {
+        console.log('getStateForAssistant: this.state:', this.state);
 
-      // Находим индекс выбранного элемента
-      let selectedIndex = -1;
-      if (this.state.selectedItemId) {
-          selectedIndex = this.state.items.findIndex(item => item.id === this.state.selectedItemId);
-          console.log('Selected item index:', selectedIndex, 'for id:', this.state.selectedItemId);
-      }
+        const currentItems = this.getCurrentItems();
+        let selectedIndex = -1;
 
-      const state = {
-          active_item_id: this.state.selectedItemId,
-          selected_item: selectedIndex >= 0 ? {
-              index: selectedIndex,
-              id: this.state.selectedItemId,
-              title: this.state.selectedItemTitle
-          } : null,
-          item_selector: {
-              items: this.state.items.map(({ id, title, type, rating }, index) => ({
-                  number: index + 1,
-                  id,
-                  title,
-                  type,
-                  rating: rating || 0,
-              })),
-              ignored_words: [
-                  'добавь', 'добавить', 'запиши', 'поставь',
-                  'удалить', 'удали',
-                  'оцени', 'поставь оценку',
-                  'отзыв', 'напиши отзыв', 'оставь отзыв'
-              ],
-          },
-      };
+        if (this.state.selectedItemId) {
+            selectedIndex = currentItems.findIndex(item => item.id === this.state.selectedItemId);
+        }
 
-      console.log('getStateForAssistant: active_item_id:', state.active_item_id);
-      return state;
-  }
+        const state = {
+            current_section: this.state.currentSection,
+            active_item_id: this.state.selectedItemId,
+            selected_item: selectedIndex >= 0 ? {
+                index: selectedIndex,
+                id: this.state.selectedItemId,
+                title: this.state.selectedItemTitle
+            } : null,
+            item_selector: {
+                items: currentItems.map(({ id, title, type, rating }, index) => ({
+                    number: index + 1,
+                    id,
+                    title,
+                    type,
+                    rating: rating || 0,
+                })),
+                ignored_words: [
+                    'добавь', 'добавить', 'запиши', 'поставь',
+                    'удалить', 'удали',
+                    'оцени', 'поставь оценку',
+                    'отзыв', 'напиши отзыв', 'оставь отзыв'
+                ],
+            },
+        };
+
+        console.log('getStateForAssistant: active_item_id:', state.active_item_id);
+        return state;
+    }
 
   dispatchAssistantAction(action) {
     console.log('dispatchAssistantAction', action);
@@ -194,55 +221,36 @@ export class App extends React.Component {
     }
     }
 
-  add_media(action) {
-      console.log('add_media', action);
-      let fullText = action.title;
-      let type = 'book';
-      let title = fullText
-      console.log('FullText:', fullText);
+    add_media(action) {
+        console.log('add_media', action);
 
-      if (fullText && typeof fullText === 'string') {
-          // Убираем слово "книгу" или "книга" (с учётом пробелов)
-          if (fullText.match(/книгу\s+/i)) {
-              type = 'book';
-              title = fullText.replace(/книгу\s+/i, '').trim();
-              console.log('Detected and removed "книгу"');
-          }
-          // Убираем слово "фильм"
-          else if (fullText.match(/фильм\s+/i)) {
-              type = 'movie';
-              title = fullText.replace(/фильм\s+/i, '').trim();
-              console.log('Detected and removed "фильм"');
-          }
-          // Если слово в конце без пробела
-          else if (fullText.endsWith('книгу')) {
-              type = 'book';
-              title = fullText.replace(/книгу$/i, '').trim();
-          }
-          else if (fullText.endsWith('фильм')) {
-              type = 'movie';
-              title = fullText.replace(/фильм$/i, '').trim();
-          }
-      }
+        let title = action.title;
+        if (Array.isArray(title)) {
+            title = title.join(' ');
+        }
 
-      // Если после очистки title пустой
-      if (!title || title === '') {
-          title = action.title;
-      }
+        // Очистка от слов "книгу", "фильм"
+        if (title && typeof title === 'string') {
+            title = title.replace(/^(книгу|фильм)\s+/i, '').trim();
+        }
 
-      console.log('Final: title="' + title + '", type=' + type);
+        // Делаем первую букву заглавной
+        if (title && title.length > 0) {
+            title = title.charAt(0).toUpperCase() + title.slice(1).toLowerCase();
+        }
 
-      const newItem = {
-          id: Math.random().toString(36).substring(7),
-          title: title,
-          type: type,
-          rating: 0,
-          review: '',
-          date: new Date().toISOString().split('T')[0],
-      };
+        const newItem = {
+            id: Math.random().toString(36).substring(7),
+            title: title,
+            type: this.state.currentSection === 'books' ? 'book' : 'movie',
+            rating: 0,
+            review: '',
+            date: new Date().toISOString().split('T')[0],
+        };
 
-      this.updateItemsAndSave([...this.state.items, newItem]);
-  }
+        const currentItems = this.getCurrentItems();
+        this.updateCurrentItems([...currentItems, newItem]);
+    }
 
     select_item(action) {
         console.log('select_item called with action:', action);
@@ -267,86 +275,46 @@ export class App extends React.Component {
         
     }
 
-  delete_media(action) {
-      console.log('delete_media', action);
-      this.updateItemsAndSave(this.state.items.filter(({ id }) => id !== action.id));
-  }
-
-   rate_media(action) {
-       console.log('rate_media', action);
-       if (action.id) {
-           const updatedItems = this.state.items.map((item) =>
-               item.id === action.id ? { ...item, rating: action.rating } : item
-           );
-           this.updateItemsAndSave(updatedItems);
-    } 
-    // Если есть itemName - ищем по названию
-    else if (action.itemName) {
-        let searchName = action.itemName;
-        
-        // Преобразуем в строку если нужно
-        if (Array.isArray(searchName)) {
-            searchName = searchName.join(' ');
-        }
-        if (typeof searchName === 'object') {
-            searchName = searchName.text || searchName.value || String(searchName);
-        }
-        
-        searchName = searchName.toLowerCase().trim();
-        console.log('Searching for item by name:', searchName);
-        
-        let found = false;
-        const updatedItems = this.state.items.map(item => {
-            const itemTitle = item.title.toLowerCase().trim();
-            
-            // Точное совпадение или частичное
-            if (itemTitle === searchName || itemTitle.includes(searchName) || searchName.includes(itemTitle)) {
-                found = true;
-                console.log(`Found: "${item.title}" -> setting rating to ${action.rating}`);
-                return { ...item, rating: action.rating };
-            }
-            return item;
-        });
-        
-        if (!found) {
-            console.log(`Item "${searchName}" not found`);
-            // Можно добавить уведомление
-            this._send_action_value('item_not_found', `Не нашла "${searchName}"`);
-        }
-        
-        this.updateItemsAndSave(updatedItems);
+    delete_media(action) {
+        console.log('delete_media', action);
+        const currentItems = this.getCurrentItems();
+        this.updateCurrentItems(currentItems.filter(({ id }) => id !== action.id));
     }
-    // Если нет ни id, ни itemName - пробуем найти по первому элементу
-    else if (this.state.items.length > 0) {
-        console.log('No identifier, rating first item');
-        const updatedItems = [...this.state.items];
-        updatedItems[0] = { ...updatedItems[0], rating: action.rating };
-        this.updateItemsAndSave(updatedItems);
+
+    rate_media(action) {
+        console.log('rate_media', action);
+        if (action.id) {
+            const currentItems = this.getCurrentItems();
+            this.updateCurrentItems(
+                currentItems.map((item) =>
+                    item.id === action.id ? { ...item, rating: action.rating } : item
+                )
+            );
+        }
     }
-}
 
-   review_media(action) {
-       console.log('review_media', action);
-       const selectedId = this.state.selectedItemId;
+    review_media(action) {
+        console.log('review_media', action);
+        const selectedId = this.state.selectedItemId;
 
-       if (!selectedId) {
-           console.log('No item selected');
-           this._send_action_value('error', 'Сначала выберите элемент');
-           return;
-       }
+        if (!selectedId) {
+            console.log('No item selected');
+            this._send_action_value('error', 'Сначала выберите элемент');
+            return;
+        }
 
-       let review = action.review;
-       if (Array.isArray(review)) {
-           review = review.join(' ');
-       }
+        let review = action.review;
+        if (Array.isArray(review)) {
+            review = review.join(' ');
+        }
 
-       console.log('Adding review to item:', selectedId, 'Review:', review);
-
-       const updatedItems = this.state.items.map((item) =>
-           item.id === selectedId ? { ...item, review: review } : item
-       );
-       this.updateItemsAndSave(updatedItems);
-   }
+        const currentItems = this.getCurrentItems();
+        this.updateCurrentItems(
+            currentItems.map((item) =>
+                item.id === selectedId ? { ...item, review: review } : item
+            )
+        );
+    }
 
   _send_action_value(action_id, value) {
     const data = {
@@ -365,28 +333,66 @@ export class App extends React.Component {
     });
   }
 
-render() {
-    console.log('render');
-    return (
-        <>
-            <MediaList
-                items={this.state.items}
-                onAdd={(title, mediaType) => {
-                    this.add_media({ type: 'add_media', title, mediaType });
-                }}
-                onDelete={(item) => {
-                    this.delete_media({ type: 'delete_media', id: item.id });
-                }}
-                onRate={(item, rating) => {
-                    this.rate_media({ type: 'rate_media', id: item.id, rating });
-                }}
-                onReview={(item, review) => {
-                    this.review_media({ type: 'review_media', id: item.id, review });
-                }}
-                onClearAll={this.clear_all_items}
-   
-            />
-        </>
-    );
-}
+    render() {
+        console.log('render, currentSection:', this.state.currentSection);
+
+        // Если раздел не выбран, показываем приветственный экран
+        if (!this.state.currentSection) {
+            return (
+                <WelcomeScreen
+                    onSelectSection={(section) => {
+                        console.log('Selected section:', section);
+                        this.setState({
+                            currentSection: section,
+                            selectedItemId: null,
+                            selectedItemTitle: null
+                        });
+                    }}
+                />
+            );
+        }
+
+        const currentItems = this.getCurrentItems();
+        const sectionTitle = this.state.currentSection === 'books' ? 'Книги' : 'Фильмы';
+
+        return (
+            <div className="container">
+                <div className="section-header">
+                    <button
+                        className="back-btn"
+                        onClick={() => this.setState({
+                            currentSection: null,
+                            selectedItemId: null,
+                            selectedItemTitle: null
+                        })}
+                    >
+                        ← Назад
+                    </button>
+                    <h1 className="section-title">{sectionTitle}</h1>
+                    {currentItems.length > 0 && (
+                        <button className="clear-all-btn" onClick={this.clear_all_items}>
+                            🗑️
+                        </button>
+                    )}
+                </div>
+
+                <MediaList
+                    items={currentItems}
+                    onAdd={(title, mediaType) => {
+                        this.add_media({ type: 'add_media', title, mediaType });
+                    }}
+                    onDelete={(item) => {
+                        this.delete_media({ type: 'delete_media', id: item.id });
+                    }}
+                    onRate={(item, rating) => {
+                        this.rate_media({ type: 'rate_media', id: item.id, rating });
+                    }}
+                    onReview={(item, review) => {
+                        this.review_media({ type: 'review_media', id: item.id, review });
+                    }}
+                    onClearAll={this.clear_all_items}
+                />
+            </div>
+        );
+    }
 }

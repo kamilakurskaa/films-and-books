@@ -1,0 +1,116 @@
+
+.welcome-screen {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.welcome-container {
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+}
+
+.welcome-title {
+    font-size: 64px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 16px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.welcome-subtitle {
+    font-size: 24px;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 48px;
+}
+
+.section-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.section-btn {
+    background: white;
+    border: none;
+    border-radius: 20px;
+    padding: 40px 20px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-align: center;
+}
+
+    .section-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+.btn-icon {
+    font-size: 80px;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.btn-title {
+    font-size: 32px;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.btn-desc {
+    font-size: 16px;
+    color: #666;
+    display: block;
+}
+
+.books-btn:hover .btn-icon {
+    animation: bounce 0.5s ease;
+}
+
+.movies-btn:hover .btn-icon {
+    animation: bounce 0.5s ease;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@media (max-width: 768px) {
+    .section-buttons {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .welcome-title {
+        font-size: 48px;
+    }
+
+    .welcome-subtitle {
+        font-size: 20px;
+    }
+
+    .section-btn {
+        padding: 30px 20px;
+    }
+
+    .btn-icon {
+        font-size: 60px;
+    }
+
+    .btn-title {
+        font-size: 28px;
+    }
+}
