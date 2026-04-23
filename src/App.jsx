@@ -33,7 +33,7 @@ export class App extends React.Component {
       const savedSelectedTitle = localStorage.getItem('media_tracker_selected_title');
 
       this.state = {
-          currentSection: null,  // <-- ДОБАВИТЬ: 'books', 'movies', или null
+          currentSection: null,  
           selectedItemId: savedSelectedId || null,
           selectedItemTitle: savedSelectedTitle || null,
           books: savedBooks.length > 0 ? savedBooks : [
@@ -144,7 +144,7 @@ export class App extends React.Component {
 
     clear_all_items = () => {
         console.log('clear_all_items');
-        this.updateCurrentItems([]);  // <-- ИСПОЛЬЗУЙТЕ updateCurrentItems
+        this.updateCurrentItems([]);  
         this._send_action_value('clear_all', 'Все элементы удалены');
     }
 

@@ -27,24 +27,7 @@ export class AddMedia extends React.Component {
                 }}
             >
                 <div style={{ display: 'flex', gap: '12px', marginTop: '48px' }}>
-                    <select
-                        className="media-type-select"
-                        value={this.state.mediaType}
-                        onChange={({ target: { value } }) => this.setState({ mediaType: value })}
-                        style={{
-                            padding: '16px 24px',
-                            fontSize: '24px',
-                            borderRadius: '64px',
-                            backgroundColor: 'rgba(255, 255, 255, 0.24)',
-                            color: '#ffffff',
-                            border: 'none',
-                            outline: 'none',
-                            cursor: 'pointer',
-                        }}
-                    >
-                        <option value="book">📚 Книга</option>
-                        <option value="movie">🎬 Фильм</option>
-                    </select>
+                    
 
                     <input
                         className="add-task"
@@ -63,7 +46,7 @@ export class AddMedia extends React.Component {
                             padding: '16px 32px',
                             fontSize: '24px',
                             borderRadius: '64px',
-                            backgroundColor: 'rgba(255, 255, 255, 0.24)',
+                            backgroundColor: '#1a5d2e',
                             color: '#ffffff',
                             border: 'none',
                             cursor: 'pointer',

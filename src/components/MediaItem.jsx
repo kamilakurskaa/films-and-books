@@ -2,17 +2,23 @@
 import "../App.css";
 
 const StarRating = ({ rating, onRate }) => {
+    const [hoverRating, setHoverRating] = React.useState(0);
+
     return (
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             {[1, 2, 3, 4, 5].map((star) => (
                 <span
                     key={star}
                     onClick={() => onRate(star)}
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
                     style={{
-                        fontSize: '28px',
+                        fontSize: '32px',
                         cursor: 'pointer',
-                        color: star <= rating ? '#FFD700' : '#555',
-                        transition: 'color 0.2s',
+                        color: star <= (hoverRating || rating) ? '#2e8b57' : '#d0e0d0',
+                        transition: 'all 0.2s',
+                        transform: hoverRating === star ? 'scale(1.1)' : 'scale(1)',
+                        display: 'inline-block',
                     }}
                 >
                     ★
@@ -75,7 +81,7 @@ export class MediaItem extends React.Component {
                                 border: 'none',
                                 borderRadius: '16px',
                                 padding: '8px 16px',
-                                color: '#fff',
+                                color: '#1a5d2e',
                                 cursor: 'pointer',
                                 fontSize: '18px',
                             }}

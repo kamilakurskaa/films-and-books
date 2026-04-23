@@ -10,11 +10,11 @@ export const MediaList = (props) => {
         <div className="container">
             <AddMedia onAdd={onAdd} />
 
-            {items.length > 0 && (
+            {/*{items.length > 0 && (
                 <button className="clear-all-btn" onClick={onClearAll}>
                     🗑️
                 </button>
-            )}
+            )}*/}
 
             <MediaItemList
                 items={items}

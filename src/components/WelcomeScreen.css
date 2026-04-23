@@ -1,7 +1,7 @@
-
+/* Welcome Screen Styles - Только зелёная палитра */
 .welcome-screen {
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -17,14 +17,13 @@
 .welcome-title {
     font-size: 64px;
     font-weight: bold;
-    color: white;
+    color: #1a5d2e;
     margin-bottom: 16px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
 }
 
 .welcome-subtitle {
     font-size: 24px;
-    color: rgba(255,255,255,0.9);
+    color: #4a6b5a;
     margin-bottom: 48px;
 }
 
@@ -32,22 +31,23 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 30px;
-    margin-top: 20px;
 }
 
 .section-btn {
-    background: white;
-    border: none;
+    background: #f0f8e8;
+    border: 2px solid #2e8b57;
     border-radius: 20px;
     padding: 40px 20px;
     cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: all 0.3s ease;
     text-align: center;
 }
 
     .section-btn:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        border-color: #f0f8e8;
+        background-color: #f0fff4;
+        box-shadow: 0 10px 30px rgba(46, 139, 86, 0.15);
     }
 
 .btn-icon {
@@ -61,31 +61,12 @@
     font-weight: bold;
     display: block;
     margin-bottom: 10px;
-    color: #333;
+    color: #1a5d2e;
 }
 
 .btn-desc {
     font-size: 16px;
-    color: #666;
-    display: block;
-}
-
-.books-btn:hover .btn-icon {
-    animation: bounce 0.5s ease;
-}
-
-.movies-btn:hover .btn-icon {
-    animation: bounce 0.5s ease;
-}
-
-@keyframes bounce {
-    0%, 100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-10px);
-    }
+    color: #4a6b5a;
 }
 
 @media (max-width: 768px) {
@@ -100,10 +81,6 @@
 
     .welcome-subtitle {
         font-size: 20px;
-    }
-
-    .section-btn {
-        padding: 30px 20px;
     }
 
     .btn-icon {

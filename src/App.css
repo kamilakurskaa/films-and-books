@@ -1,5 +1,9 @@
+/* Общий фон страницы - белый */
 body {
-    background-color: #292929;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
 .container {
@@ -8,96 +12,178 @@ body {
     padding: 0 48px;
 }
 
-.add-task,
-.media-type-select {
-    background-color: rgba(255, 255, 255, 0.24);
+/* Заголовок страницы (Книги/Фильмы) */
+.section-title {
+    font-size: 48px;
+    font-weight: bold;
+    color: #1a5d2e;
+    margin: 0;
+    flex: 1;
+    text-align: center;
+}
+
+/* Контейнер для формы добавления */
+.add-form {
+    display: flex;
+    gap: 12px;
+    margin-top: 48px;
+    align-items: center;
+}
+
+/* Поле ввода - БЕЛЫЙ фон */
+.add-task {
+    flex: 1;
+    background-color: #f0f8e8;
+    border: 2px solid #2e8b57;
     padding: 16px 32px;
-    font-weight: 500;
-    font-style: normal;
     font-size: 24px;
     line-height: 40px;
-    color: #ffffff;
-}
-
-.add-task {
-    height: 72px;
-    outline: none;
-    border: none;
+    color: #1a5d2e;
     border-radius: 64px;
+    outline: none;
+    transition: all 0.3s ease;
 }
 
-    .add-task::placeholder {
-        color: rgba(255, 255, 255, 0.56);
+    .add-task:focus {
+        border-color: #236b43;
+        box-shadow: 0 0 0 3px rgba(46, 139, 86, 0.15);
     }
 
-.notes {
-    margin: 36px 0 144px;
-    padding: 0;
-    list-style: none;
+    .add-task::placeholder {
+        color: #b0c4b0;
+    }
+
+/* Выпадающий список - БЕЛЫЙ фон */
+.media-type-select {
+    background-color: #f0f8e8;
+    border: 2px solid #2e8b57;
+    padding: 16px 24px;
+    font-size: 24px;
+    border-radius: 64px;
+    color: #f0f8e8;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
 }
 
+    .media-type-select:focus {
+        border-color: #236b43;
+        box-shadow: 0 0 0 3px rgba(46, 139, 86, 0.15);
+    }
+
+/* Кнопка добавления - ЗЕЛЁНЫЙ фон (#2e8b57) */
+.add-btn {
+    background-color: #2e8b57 !important;
+    border: none;
+    border-radius: 64px;
+    padding: 16px 32px;
+    font-size: 32px;
+    font-weight: bold;
+    color: #f0f8e8;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+}
+
+    .add-btn:hover {
+        background-color: #f0f8e8;
+        transform: scale(1.02);
+    }
+
+/* Элемент списка (карточка) */
 .task-item {
     margin-bottom: 24px;
     border-radius: 24px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    background-color: rgba(255, 255, 255, 0.24);
+    background-color: #f0f8e8;
+    border: 2px solid #2e8b57;
     padding: 24px 32px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.clear-all-btn {
-    height: 72px;
-    width: 72px;
-    padding: 0;
-    margin-top: 48px;
-    background-color: rgba(255, 255, 255, 0.24);
-    border: none;
-    border-radius: 32px;
-    color: #ffffff;
+    .task-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(46, 139, 86, 0.15);
+        border-color: #236b43;
+    }
+
+/* Контент внутри карточки */
+.task-content {
+    flex: 1;
+}
+
+/* Верхняя строка карточки */
+.task-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+/* Номер элемента */
+.task-number {
+    font-weight: bold;
+    font-size: 28px;
+    color: #2e8b57;
+    min-width: 40px;
+}
+
+/* Иконка типа */
+.task-icon {
     font-size: 32px;
+}
+
+/* Название элемента */
+.task-title {
+    font-size: 28px;
+    font-weight: 500;
+    color: #1a5d2e;
+    flex: 1;
+}
+
+/* Кнопка удаления - ТЁМНО-ЗЕЛЁНЫЙ фон (#236b43) */
+.delete-btn {
+    background-color: #236b43;
+    border: none;
+    border-radius: 16px;
+    padding: 8px 20px;
+    color: white;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: opacity 0.2s;
+    font-size: 18px;
+    transition: all 0.2s;
 }
 
-    .clear-all-btn:hover {
-        opacity: 0.8;
+    .delete-btn:hover {
+        background-color: #1a5d2e;
+        transform: translateY(-1px);
     }
 
-@media (max-width: 768px) {
-    .container {
-        padding: 0 20px;
-    }
-
-    .add-task,
-    .media-type-select {
-        font-size: 18px;
-        padding: 12px 20px;
-    }
-
-    .task-item {
-        padding: 16px 20px;
-    }
-
-        .task-item span {
-            font-size: 20px !important;
-        }
+/* Кнопка отзыва - СРЕДНЕ-ЗЕЛЁНЫЙ фон (#2e8b57) */
+.review-btn {
+    background-color: #2e8b57;
+    border: none;
+    border-radius: 16px;
+    padding: 8px 20px;
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.2s;
 }
 
-.section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 32px 0;
-    gap: 20px;
-}
+    .review-btn:hover {
+        background-color: #236b43;
+        transform: translateY(-1px);
+    }
 
+/* Кнопка "Назад" - ТЁМНО-ЗЕЛЁНЫЙ фон (#1a5d2e) */
 .back-btn {
-    background: rgba(255, 255, 255, 0.2);
+    background-color: #1a5d2e;
     border: none;
     padding: 12px 24px;
     font-size: 18px;
@@ -108,20 +194,96 @@ body {
 }
 
     .back-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
+        background-color: #0d4a23;
         transform: translateX(-3px);
     }
 
-.section-title {
-    font-size: 48px;
-    font-weight: bold;
+/* Кнопка очистки всех - СВЕТЛО-ЗЕЛЁНЫЙ фон (#3cb371) */
+.clear-all-btn {
+    height: 72px;
+    width: 72px;
+    padding: 0;
+    margin-top: 48px;
+    background-color: #3cb371;
+    border: none;
+    border-radius: 50%;
     color: white;
-    margin: 0;
-    flex: 1;
-    text-align: center;
+    font-size: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
 }
 
+    .clear-all-btn:hover {
+        background-color: #2e8b57;
+        transform: scale(1.05);
+    }
+
+/* Контейнер для списка */
+.notes {
+    margin: 36px 0 144px;
+    padding: 0;
+    list-style: none;
+}
+
+/* Отзыв внутри карточки */
+.review-text {
+    margin-top: 16px;
+    padding: 12px 20px;
+    background-color: #f0f8e8;
+    border-radius: 16px;
+    font-size: 18px;
+    font-style: italic;
+    border-left: 4px solid #2e8b57;
+    color: #1a5d2e;
+}
+
+/* Заголовок раздела */
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 32px 0;
+    gap: 20px;
+}
+
+/* Адаптивность */
 @media (max-width: 768px) {
+    .container {
+        padding: 0 20px;
+    }
+
+    .add-form {
+        flex-wrap: wrap;
+    }
+
+    .add-task,
+    .media-type-select {
+        font-size: 18px;
+        padding: 12px 20px;
+    }
+
+    .add-btn {
+        font-size: 24px;
+        padding: 12px 24px;
+        min-width: 60px;
+    }
+
+    .task-item {
+        padding: 16px 20px;
+    }
+
+    .task-title {
+        font-size: 20px;
+    }
+
+    .task-number {
+        font-size: 20px;
+    }
+
     .section-title {
         font-size: 32px;
     }
