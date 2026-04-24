@@ -51,7 +51,7 @@ export class MediaItem extends React.Component {
                     }
                 }}
                 style={{
-                    backgroundColor: isSelected ? 'rgba(46, 139, 86, 0.15)' : 'rgba(255, 255, 255, 0.24)',
+                    backgroundColor: isSelected ? '#f8fff8' : 'rgba(255, 255, 255, 0.9)',
                     border: isSelected ? '2px solid #2e8b57' : '2px solid transparent',
                     cursor: 'pointer',
                     transition: 'all 0.2s',
@@ -85,7 +85,7 @@ export class MediaItem extends React.Component {
                                 onDelete(item);
                             }}
                             style={{
-                                background: 'rgba(255, 0, 0, 0.3)',
+                                background: 'rgba(46, 139, 86, 0.15)',
                                 border: 'none',
                                 borderRadius: '16px',
                                 padding: '8px 16px',
@@ -102,7 +102,7 @@ export class MediaItem extends React.Component {
                                 this.setState({ showReviewInput: !showReviewInput });
                             }}
                             style={{
-                                background: 'rgba(255, 255, 255, 0.2)',
+                                background: '#e8f5e9',
                                 border: 'none',
                                 borderRadius: '16px',
                                 padding: '8px 16px',
@@ -120,7 +120,7 @@ export class MediaItem extends React.Component {
                             style={{
                                 marginTop: '16px',
                                 padding: '12px 16px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                backgroundColor: '#e8f5e9',
                                 borderRadius: '16px',
                                 fontSize: '20px',
                                 fontStyle: 'italic',

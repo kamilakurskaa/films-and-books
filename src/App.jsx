@@ -37,24 +37,8 @@ export class App extends React.Component {
           selectedItemId: savedSelectedId || null,
           selectedItemTitle: savedSelectedTitle || null,
           books: savedBooks.length > 0 ? savedBooks : [
-              {
-                  id: '1',
-                  title: 'Война и мир',
-                  type: 'book',
-                  rating: 5,
-                  review: 'Шедевр',
-                  date: '2026-01-15'
-              }
           ],
           movies: savedMovies.length > 0 ? savedMovies : [
-              {
-                  id: '2',
-                  title: 'Твоё сердце будет разбито',
-                  type: 'movie',
-                  rating: 4,
-                  review: 'Отличный сюжет',
-                  date: '2026-05-15'
-              }
           ],
       };
 
@@ -134,22 +118,7 @@ export class App extends React.Component {
         });
     }
 
-    /*// Сохранение данных в localStorage
-    saveToStorage(items) {
-        try {
-            localStorage.setItem('media_tracker_items', JSON.stringify(items));
-            console.log('Saved to storage:', items.length, 'items');
-        } catch (error) {
-            console.error('Error saving to storage:', error);
-        }
-    }
-
-    // Обновляем состояние и сохраняем
-    updateItemsAndSave(newItems) {
-        this.setState({ items: newItems }, () => {
-            this.saveToStorage(this.state.items);
-        });
-    }*/
+    
 
     clear_all_items = () => {
         console.log('clear_all_items');
@@ -264,7 +233,7 @@ export class App extends React.Component {
     select_item(action) {
         console.log('select_item called with action:', action);
 
-        // Подсвечиваем выбранный элемент (можно добавить визуальное выделение)
+        // Подсвечиваем выбранный элемент
         this.setState({
             selectedItemId: action.id,
             selectedItemTitle: action.title
@@ -308,7 +277,7 @@ export class App extends React.Component {
         console.log('selectedId from state:', this.state.selectedItemId);
         console.log('id from action:', action.id);
 
-        // СНАЧАЛА пытаемся взять id из action, потом из state
+        // Сначала пытаемся взять id из action, потом из state
         let selectedId = action.id || this.state.selectedItemId;
 
         console.log('Final selectedId:', selectedId);
@@ -326,7 +295,7 @@ export class App extends React.Component {
 
         console.log('Review text:', review);
 
-        // ОБНОВЛЯЕМ selectedItemId в state
+        // Обновляем selectedItemId в state
         this.setState({ selectedItemId: selectedId });
 
         const currentItems = this.getCurrentItems();
@@ -408,7 +377,7 @@ export class App extends React.Component {
                     onAdd={(title, mediaType) => {
                         this.add_media({ type: 'add_media', title, mediaType });
                     }}
-                    onSelectItem={(item) => {  // Добавить
+                    onSelectItem={(item) => {  
                         console.log('Manual select item:', item);
                         this.select_item({ type: 'select_item', id: item.id, title: item.title });
                     }}

@@ -1,7 +1,7 @@
-/* Welcome Screen Styles - Только зелёная палитра */
+
 .welcome-screen {
     min-height: 100vh;
-    background-color: #D3D3D3;
+    background-color: #C0C0C0;
     display: flex;
     align-items: center;
     justify-content: center;
