@@ -1,11 +1,9 @@
 import React from "react";
-
-import {MediaItem} from './MediaItem';
+import { MediaItem } from './MediaItem';
 import "../App.css";
 
-
 export const MediaItemList = (props) => {
-    const { items, onDelete, onRate, onReview } = props;
+    const { items, onDelete, onRate, onReview, onSelectItem, selectedItemId } = props;
 
     return (
         <ul className="notes">
@@ -14,6 +12,8 @@ export const MediaItemList = (props) => {
                     key={item.id}
                     item={item}
                     index={index}
+                    isSelected={selectedItemId === item.id}
+                    onSelectItem={onSelectItem}
                     onDelete={onDelete}
                     onRate={onRate}
                     onReview={onReview}
@@ -22,5 +22,3 @@ export const MediaItemList = (props) => {
         </ul>
     );
 };
-
-

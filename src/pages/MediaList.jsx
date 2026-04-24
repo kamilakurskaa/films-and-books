@@ -4,7 +4,7 @@ import { MediaItemList } from '../components/MediaItemList';
 import '../App.css';
 
 export const MediaList = (props) => {
-    const { items, onAdd, onDelete, onRate, onReview, onClearAll } = props;
+    const { items, onAdd, onDelete, onRate, onReview, onClearAll, onSelectItem, selectedItemId } = props;
 
     return (
         <div className="container">
@@ -18,6 +18,8 @@ export const MediaList = (props) => {
 
             <MediaItemList
                 items={items}
+                selectedItemId={selectedItemId}
+                onSelectItem={onSelectItem}
                 onDelete={onDelete}
                 onRate={onRate}
                 onReview={onReview}

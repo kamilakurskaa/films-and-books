@@ -108,7 +108,9 @@ export class App extends React.Component {
 
 
     getCurrentItems() {
-        return this.state.currentSection === 'books' ? this.state.books : this.state.movies;
+        const items = this.state.currentSection === 'books' ? this.state.books : this.state.movies;
+        console.log('getCurrentItems - section:', this.state.currentSection, 'items count:', items?.length);
+        return items;
     }
 
     getCurrentStorageKey() {
@@ -116,12 +118,19 @@ export class App extends React.Component {
     }
 
     updateCurrentItems(newItems) {
+        console.log('updateCurrentItems - START');
+        console.log('newItems:', newItems);
         const key = this.getCurrentStorageKey();
         const stateField = this.state.currentSection === 'books' ? 'books' : 'movies';
+        console.log('Updating stateField:', stateField, 'with items:', newItems.length);
 
         this.setState({ [stateField]: newItems }, () => {
             localStorage.setItem(key, JSON.stringify(newItems));
             console.log('Saved to', key, ':', newItems.length, 'items');
+            console.log('State after update -', stateField, ':', this.state[stateField]);
+
+            // Принудительное обновление
+            this.forceUpdate();
         });
     }
 
@@ -294,11 +303,18 @@ export class App extends React.Component {
     }
 
     review_media(action) {
-        console.log('review_media', action);
-        const selectedId = this.state.selectedItemId;
+        console.log('=== review_media START ===');
+        console.log('action:', action);
+        console.log('selectedId from state:', this.state.selectedItemId);
+        console.log('id from action:', action.id);
+
+        // СНАЧАЛА пытаемся взять id из action, потом из state
+        let selectedId = action.id || this.state.selectedItemId;
+
+        console.log('Final selectedId:', selectedId);
 
         if (!selectedId) {
-            console.log('No item selected');
+            console.log('ERROR: No item selected');
             this._send_action_value('error', 'Сначала выберите элемент');
             return;
         }
@@ -308,12 +324,22 @@ export class App extends React.Component {
             review = review.join(' ');
         }
 
+        console.log('Review text:', review);
+
+        // ОБНОВЛЯЕМ selectedItemId в state
+        this.setState({ selectedItemId: selectedId });
+
         const currentItems = this.getCurrentItems();
-        this.updateCurrentItems(
-            currentItems.map((item) =>
-                item.id === selectedId ? { ...item, review: review } : item
-            )
+        console.log('Current items before update:', currentItems);
+
+        const updatedItems = currentItems.map((item) =>
+            item.id === selectedId ? { ...item, review: review } : item
         );
+
+        console.log('Updated items after map:', updatedItems);
+
+        this.updateCurrentItems(updatedItems);
+        console.log('=== review_media END ===');
     }
 
   _send_action_value(action_id, value) {
@@ -378,8 +404,13 @@ export class App extends React.Component {
 
                 <MediaList
                     items={currentItems}
+                    selectedItemId={this.state.selectedItemId}
                     onAdd={(title, mediaType) => {
                         this.add_media({ type: 'add_media', title, mediaType });
+                    }}
+                    onSelectItem={(item) => {  // Добавить
+                        console.log('Manual select item:', item);
+                        this.select_item({ type: 'select_item', id: item.id, title: item.title });
                     }}
                     onDelete={(item) => {
                         this.delete_media({ type: 'delete_media', id: item.id });

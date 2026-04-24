@@ -38,11 +38,25 @@ export class MediaItem extends React.Component {
     }
 
     render() {
-        const { item, index, onDelete, onRate, onReview } = this.props;
+        const { item, index, onDelete, onRate, onReview, onSelectItem, isSelected } = this.props;
         const { showReviewInput, reviewText } = this.state;
 
         return (
-            <li className="task-item">
+            <li
+                className="task-item"
+                onClick={() => {
+                    console.log('Item clicked:', item);
+                    if (onSelectItem) {
+                        onSelectItem(item);
+                    }
+                }}
+                style={{
+                    backgroundColor: isSelected ? 'rgba(46, 139, 86, 0.15)' : 'rgba(255, 255, 255, 0.24)',
+                    border: isSelected ? '2px solid #2e8b57' : '2px solid transparent',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                }}
+            >
                 <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
                         <span style={{ fontWeight: "bold", fontSize: '32px' }}>
@@ -58,10 +72,18 @@ export class MediaItem extends React.Component {
                             }}
                         >
                             {item.title}
+                            {isSelected && (
+                                <span style={{ fontSize: '16px', marginLeft: '12px', color: '#2e8b57' }}>
+                                    ✓ Выбрано
+                                </span>
+                            )}
                         </span>
                         <StarRating rating={item.rating} onRate={(rating) => onRate(item, rating)} />
                         <button
-                            onClick={() => onDelete(item)}
+                            onClick={(e) => {
+                                e.stopPropagation(); // Чтобы не сработал выбор элемента
+                                onDelete(item);
+                            }}
                             style={{
                                 background: 'rgba(255, 0, 0, 0.3)',
                                 border: 'none',
@@ -75,7 +97,10 @@ export class MediaItem extends React.Component {
                             🗑️
                         </button>
                         <button
-                            onClick={() => this.setState({ showReviewInput: !showReviewInput })}
+                            onClick={(e) => {
+                                e.stopPropagation(); // Чтобы не сработал выбор элемента
+                                this.setState({ showReviewInput: !showReviewInput });
+                            }}
                             style={{
                                 background: 'rgba(255, 255, 255, 0.2)',
                                 border: 'none',
