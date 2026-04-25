@@ -233,7 +233,6 @@ export class App extends React.Component {
         console.log('add_media', action);
 
         let title = action.title;
-        let mediaType = action.mediaType; // Может быть передан из сценария
 
         if (Array.isArray(title)) {
             title = title.join(' ');
