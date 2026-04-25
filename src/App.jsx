@@ -191,6 +191,9 @@ export class App extends React.Component {
         case 'clear_all':
               return this.clear_all_items();
 
+        case 'switch_section':
+              return this.switch_section(action);
+
 
 
         default:
@@ -199,27 +202,137 @@ export class App extends React.Component {
     }
     }
 
+    switch_section(action) {
+        console.log('switch_section', action);
+
+        const targetSection = action.section;
+
+        if (targetSection === 'books' || targetSection === 'movies') {
+            this.setState({
+                currentSection: targetSection,
+                selectedItemId: null,
+                selectedItemTitle: null
+            }, () => {
+                localStorage.setItem('media_tracker_current_section', targetSection);
+
+                const sectionName = targetSection === 'books' ? 'книги' : 'фильмы';
+                this._send_action_value('section_switched', `Переключился на раздел ${sectionName}`);
+
+                if (this.assistant && this.assistant.sendState) {
+                    const currentState = this.getStateForAssistant();
+                    this.assistant.sendState(currentState);
+                }
+            });
+        } else {
+            console.error('Unknown section:', targetSection);
+            this._send_action_value('error', 'Не могу переключиться в этот раздел');
+        }
+    }
+
     add_media(action) {
         console.log('add_media', action);
 
         let title = action.title;
+        let mediaType = action.mediaType; // Может быть передан из сценария
+
         if (Array.isArray(title)) {
             title = title.join(' ');
         }
 
-        // Очистка от слов "книгу", "фильм"
+        // Определяем тип медиа из текста (если не передан явно)
+        let detectedType = null;
+        let cleanTitle = title;
+
         if (title && typeof title === 'string') {
-            title = title.replace(/^(книгу|фильм)\s+/i, '').trim();
+            const titleLower = title.toLowerCase();
+
+            // Проверяем явное указание типа в тексте
+            if (titleLower.includes('книг') || titleLower.includes('роман') || titleLower.includes('повесть')) {
+                detectedType = 'book';
+                cleanTitle = title.replace(/^(книгу|книга|книги|роман|повесть)\s+/i, '').trim();
+            } else if (titleLower.includes('фильм') || titleLower.includes('кино') || titleLower.includes('сериал')) {
+                detectedType = 'movie';
+                cleanTitle = title.replace(/^(фильм|фильма|фильмы|кино|сериал)\s+/i, '').trim();
+            }
+        }
+
+        // Если тип определён из текста и он не соответствует текущему разделу
+        const currentMediaType = this.state.currentSection === 'books' ? 'book' : 'movie';
+        const needSwitch = detectedType && detectedType !== currentMediaType;
+
+        // Если нужно переключить раздел
+        if (needSwitch && this.state.currentSection) {
+            const targetSection = detectedType === 'book' ? 'books' : 'movies';
+            const targetSectionName = detectedType === 'book' ? 'книги' : 'фильмы';
+            const addedText = detectedType === 'book' ? 'книгу' : 'фильм';
+            const finalTitle = cleanTitle || title;
+
+            console.log(`Auto-switching from ${this.state.currentSection} to ${targetSection}`);
+
+            // Переключаем раздел
+            this.setState({
+                currentSection: targetSection,
+                selectedItemId: null,
+                selectedItemTitle: null
+            }, () => {
+                // Сохраняем в localStorage
+                localStorage.setItem('media_tracker_current_section', targetSection);
+
+                // Делаем первую букву заглавной
+                let capitalizedTitle = finalTitle;
+                if (capitalizedTitle && capitalizedTitle.length > 0) {
+                    capitalizedTitle = capitalizedTitle.charAt(0).toUpperCase() + capitalizedTitle.slice(1).toLowerCase();
+                }
+
+                const newItem = {
+                    id: Math.random().toString(36).substring(7),
+                    title: capitalizedTitle,
+                    type: detectedType,
+                    rating: 0,
+                    review: '',
+                    date: new Date().toISOString().split('T')[0],
+                };
+
+                // Добавляем в соответствующий массив
+                const targetItems = targetSection === 'books' ? this.state.books : this.state.movies;
+                const updatedItems = [...targetItems, newItem];
+                const stateField = targetSection === 'books' ? 'books' : 'movies';
+                const storageKey = targetSection === 'books' ? 'media_tracker_books' : 'media_tracker_movies';
+
+                this.setState({ [stateField]: updatedItems }, () => {
+                    localStorage.setItem(storageKey, JSON.stringify(updatedItems));
+                    console.log(`Added ${addedText} "${capitalizedTitle}" to ${targetSectionName}`);
+
+                    // Голосовой ответ
+                    this._send_action_value('add_success', `Переключился в раздел ${targetSectionName} и добавил ${addedText} ${capitalizedTitle}`);
+
+                    // Отправляем новое состояние ассистенту
+                    if (this.assistant && this.assistant.sendState) {
+                        const currentState = this.getStateForAssistant();
+                        this.assistant.sendState(currentState);
+                    }
+                });
+            });
+
+            return; // Выходим, так как уже обработали
+        }
+
+        // Если тип не указан или соответствует текущему разделу - обычное добавление
+        let finalTitle = cleanTitle || title;
+
+        // Очистка от слов "книгу", "фильм" (если остались)
+        if (finalTitle && typeof finalTitle === 'string') {
+            finalTitle = finalTitle.replace(/^(книгу|фильм|книга|фильма?)\s+/i, '').trim();
         }
 
         // Делаем первую букву заглавной
-        if (title && title.length > 0) {
-            title = title.charAt(0).toUpperCase() + title.slice(1).toLowerCase();
+        if (finalTitle && finalTitle.length > 0) {
+            finalTitle = finalTitle.charAt(0).toUpperCase() + finalTitle.slice(1).toLowerCase();
         }
 
         const newItem = {
             id: Math.random().toString(36).substring(7),
-            title: title,
+            title: finalTitle,
             type: this.state.currentSection === 'books' ? 'book' : 'movie',
             rating: 0,
             review: '',
@@ -229,7 +342,6 @@ export class App extends React.Component {
         const currentItems = this.getCurrentItems();
         this.updateCurrentItems([...currentItems, newItem]);
     }
-
     select_item(action) {
         console.log('select_item called with action:', action);
 

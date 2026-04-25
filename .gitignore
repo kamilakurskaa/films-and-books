@@ -109,3 +109,4 @@ _temp/
 # Visual Studio
 .vs/
 .vscode/
+.vercel
