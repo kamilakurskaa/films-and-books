@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import "../App.css";
 
 export class AddMedia extends React.Component {

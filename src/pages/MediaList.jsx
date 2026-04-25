@@ -1,10 +1,10 @@
-﻿import React from 'react';
+import React from 'react';
 import { AddMedia } from '../components/AddMedia';
 import { MediaItemList } from '../components/MediaItemList';
 import '../App.css';
 
 export const MediaList = (props) => {
-    const { items, onAdd, onDelete, onRate, onReview, onClearAll, onSelectItem, selectedItemId } = props;
+    const { items, onAdd, onDelete, onRate, onReview, onSelectItem, selectedItemId } = props;
 
     return (
         <div className="container">

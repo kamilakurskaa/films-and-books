@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import './WelcomeScreen.css';
 
 export const WelcomeScreen = ({ onSelectSection }) => {
