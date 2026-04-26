@@ -57,81 +57,65 @@ export class MediaItem extends React.Component {
                     transition: 'all 0.2s',
                 }}
             >
-                <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                        <span style={{ fontWeight: "bold", fontSize: '32px' }}>
+                <div classname="task-content">
+                    <div classname="task-header">
+                        <span className="task-number">
                             {index + 1}.
                         </span>
-                        <span style={{ fontSize: '28px' }}>
-                            {item.type === 'book' ? '📚' : '🎬'}
-                        </span>
-                        <span
-                            style={{
-                                fontSize: '32px',
-                                fontWeight: '500',
-                            }}
-                        >
-                            {item.title}
-                            {isSelected && (
-                                <span style={{ fontSize: '16px', marginLeft: '12px', color: '#2e8b57' }}>
-                                    ✓ Выбрано
+                            <div className="task-title-wrapper">
+                                <span className="task-icon">{item.type === 'book' ? '📚' : '🎬'}</span>
+                                <span className="task-title">
+                                    {item.title}
+                                    {isSelected && (
+                                        <span style={{ fontSize: '12px', marginLeft: '8px', color: '#2e8b57' }}>
+                                            ✓ Выбрано
+                                        </span>
+                                    )}
                                 </span>
-                            )}
-                        </span>
-                        <StarRating rating={item.rating} onRate={(rating) => onRate(item, rating)} />
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation(); // Чтобы не сработал выбор элемента
-                                onDelete(item);
-                            }}
-                            style={{
-                                background: 'rgba(46, 139, 86, 0.15)',
-                                border: 'none',
-                                borderRadius: '16px',
-                                padding: '8px 16px',
-                                color: '#fff',
-                                cursor: 'pointer',
-                                fontSize: '18px',
-                            }}
-                        >
-                            🗑️
-                        </button>
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation(); // Чтобы не сработал выбор элемента
-                                this.setState({ showReviewInput: !showReviewInput });
-                            }}
-                            style={{
-                                background: '#e8f5e9',
-                                border: 'none',
-                                borderRadius: '16px',
-                                padding: '8px 16px',
-                                color: '#1a5d2e',
-                                cursor: 'pointer',
-                                fontSize: '18px',
-                            }}
-                        >
-                            {item.review ? '✏️ Изменить отзыв' : '💬 Добавить отзыв'}
-                        </button>
+                            </div>
+                            <div className="star-rating">
+                                <StarRating rating={item.rating} onRate={(rating) => onRate(item, rating)} />
+                            </div>
+                            <div className="task-actions">
+                                <button
+                                    className="delete-btn"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDelete(item);
+                                    }}
+                                >
+                                    🗑️
+                                </button>
+                                <button
+                                    className="review-btn"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        this.setState({ showReviewInput: !showReviewInput });
+                                    }}
+                                    style={{
+                                        background: '#e8f5e9',
+                                        border: 'none',
+                                        borderRadius: '16px',
+                                        padding: '8px 16px',
+                                        color: '#1a5d2e',
+                                    }}
+                                >
+                                    {item.review ? '✏️' : '💬'}
+                                    <span style={{ marginLeft: '4px', fontSize: '12px' }}>
+                                        {item.review ? 'Изменить' : 'Отзыв'}
+                                    </span>
+                                </button>
+                            </div>
                     </div>
 
                     {item.review && !showReviewInput && (
-                        <div
-                            style={{
-                                marginTop: '16px',
-                                padding: '12px 16px',
-                                backgroundColor: '#e8f5e9',
-                                borderRadius: '16px',
-                                fontSize: '20px',
-                                fontStyle: 'italic',
-                            }}
-                        >
+                        <div className="review-text">
                             💭 {item.review}
                         </div>
                     )}
 
                     {showReviewInput && (
-                        <div style={{ marginTop: '16px', display: 'flex', gap: '12px' }}>
+                        <div style={{ marginTop: '12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                             <input
                                 type="text"
                                 placeholder="Ваш отзыв..."
@@ -139,12 +123,12 @@ export class MediaItem extends React.Component {
                                 onChange={(e) => this.setState({ reviewText: e.target.value })}
                                 style={{
                                     flex: 1,
-                                    padding: '12px 16px',
-                                    fontSize: '18px',
-                                    borderRadius: '16px',
-                                    border: 'none',
+                                    padding: '10px 12px',
+                                    fontSize: '14px',
+                                    borderRadius: '12px',
+                                    border: '1px solid #2e8b57',
                                     outline: 'none',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                    minWidth: '150px',
                                 }}
                             />
                             <button
@@ -153,13 +137,13 @@ export class MediaItem extends React.Component {
                                     this.setState({ showReviewInput: false });
                                 }}
                                 style={{
-                                    padding: '12px 24px',
-                                    backgroundColor: '#4CAF50',
+                                    padding: '10px 20px',
+                                    backgroundColor: '#2e8b57',
                                     border: 'none',
-                                    borderRadius: '16px',
+                                    borderRadius: '12px',
                                     color: '#fff',
                                     cursor: 'pointer',
-                                    fontSize: '16px',
+                                    fontSize: '14px',
                                 }}
                             >
                                 Сохранить

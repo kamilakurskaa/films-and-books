@@ -77,6 +77,10 @@
 
     .welcome-title {
         font-size: 48px;
+        white-space: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 8px;
     }
 
     .welcome-subtitle {
@@ -89,5 +93,13 @@
 
     .btn-title {
         font-size: 28px;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-title {
+        font-size: 28px;
+        flex-direction: column;
+        gap: 4px;
     }
 }

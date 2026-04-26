@@ -253,43 +253,150 @@ body {
 /* Адаптивность */
 @media (max-width: 768px) {
     .container {
-        padding: 0 20px;
+        padding: 0 16px;
     }
 
-    .add-form {
-        flex-wrap: wrap;
+    /* Карточка элемента */
+    .task-item {
+        padding: 12px 16px;
+        margin-bottom: 16px;
     }
 
-    .add-task,
-    .media-type-select {
+    /* Контент внутри карточки */
+    .task-content {
+        width: 100%;
+    }
+
+    /* Верхняя строка карточки - теперь вертикальная на телефонах */
+    .task-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    /* Номер элемента */
+    .task-number {
         font-size: 18px;
+        min-width: auto;
+    }
+
+    /* Иконка и название в одной строке */
+    .task-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .task-icon {
+        font-size: 24px;
+    }
+
+    .task-title {
+        font-size: 18px;
+        word-break: break-word;
+        flex: 1;
+    }
+
+    /* Кнопки действий */
+    .task-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .delete-btn,
+    .review-btn {
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+
+    /* Рейтинг звёздами */
+    .star-rating {
+        display: flex;
+        gap: 4px;
+    }
+
+        .star-rating span {
+            font-size: 24px !important;
+        }
+
+    /* Форма добавления */
+    .add-form {
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 24px;
+    }
+
+    .add-task {
+        font-size: 16px;
+        padding: 12px 20px;
+        width: 100%;
+    }
+
+    .media-type-select {
+        width: 100%;
+        font-size: 16px;
         padding: 12px 20px;
     }
 
     .add-btn {
-        font-size: 24px;
-        padding: 12px 24px;
-        min-width: 60px;
-    }
-
-    .task-item {
-        padding: 16px 20px;
-    }
-
-    .task-title {
+        width: 100%;
+        padding: 12px 20px;
         font-size: 20px;
     }
 
-    .task-number {
-        font-size: 20px;
+    /* Заголовок секции */
+    .section-header {
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 16px 0;
     }
 
     .section-title {
-        font-size: 32px;
+        font-size: 28px;
+        order: 1;
+        text-align: center;
+        width: 100%;
     }
 
     .back-btn {
+        order: 0;
         padding: 8px 16px;
         font-size: 14px;
+    }
+
+    .clear-all-btn {
+        order: 2;
+        height: 40px;
+        width: 40px;
+        font-size: 20px;
+        margin-top: 0;
+    }
+
+    /* Отзыв */
+    .review-text {
+        font-size: 14px;
+        padding: 8px 12px;
+        margin-top: 12px;
+    }
+}
+@media (max-width: 480px) {
+    .task-title-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .task-actions {
+        justify-content: stretch;
+    }
+
+    .delete-btn,
+    .review-btn {
+        flex: 1;
+        text-align: center;
     }
 }
