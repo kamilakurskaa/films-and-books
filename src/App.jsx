@@ -40,6 +40,7 @@ export class App extends React.Component {
           ],
           movies: savedMovies.length > 0 ? savedMovies : [
           ],
+          assistantReady: false,
       };
 
       this.assistant = initializeAssistant(() => this.getStateForAssistant());
@@ -60,7 +61,9 @@ export class App extends React.Component {
     this.assistant.on('start', (event) => {
       let initialData = this.assistant.getInitialData();
 
-      console.log(`assistant.on(start)`, event, initialData);
+        console.log(`assistant.on(start)`, event, initialData);
+        this.setState({ assistantReady: true });
+        ///this.sendWelcomeMessage();
     });
 
     this.assistant.on('command', (event) => {
@@ -126,9 +129,64 @@ export class App extends React.Component {
         this._send_action_value('clear_all', 'Все элементы удалены');
     }
 
-  componentDidMount() {
-    console.log('componentDidMount');
-  }
+    componentDidMount() {
+      if (window.smartApp) {
+          window.smartApp.onBackButton(() => {
+              console.log('Back button pressed');
+              this.handleBackButton();
+              return true; // Говорим, что мы обработали событие
+          });
+      }
+
+      // Альтернативный способ через ассистента
+      if (this.assistant) {
+          this.assistant.on('back', () => {
+              console.log('Back event from assistant');
+              this.handleBackButton();
+          });
+        }
+
+        if (this.assistant && this.state.assistantReady) {
+            this.sendWelcomeMessage();
+        }
+    }
+    sendWelcomeMessage = () => {
+        if (!this.assistant) {
+            console.log('Assistant not ready yet');
+            return;
+        }
+
+        const currentSection = this.state.currentSection;
+
+        let message = "";
+
+        if (!currentSection) {
+            // На главном экране выбора разделов
+            message = "Добро пожаловать в Медиатеку! Я помогу вам вести коллекцию книг и фильмов. Скажите «Перейди в книги» или «Перейди в фильмы», чтобы начать.";
+        } 
+        // Отправляем приветствие ассистенту
+        this._send_action_value('welcome', message);
+    }
+
+    handleBackButton() {
+        if (this.state.currentSection) {
+            // Если мы в разделе (книги/фильмы) - возвращаемся на главный экран
+            this.setState({
+                currentSection: null,
+                selectedItemId: null,
+                selectedItemTitle: null
+            });
+
+            // Отправляем ответ ассистенту
+            this._send_action_value('back_to_main', 'Возвращаюсь в главное меню');
+
+            console.log('Back: returned to main screen');
+        } else {
+            // Если мы уже на главном экране - выходим из приложения
+            // Возвращаем false, чтобы устройство обработало выход самостоятельно
+            return false;
+        }
+    }
 
     getStateForAssistant() {
         console.log('getStateForAssistant: this.state:', this.state);
@@ -437,7 +495,8 @@ export class App extends React.Component {
       console.log('sendData onData:', type, payload);
       unsubscribe();
     });
-  }
+    }
+
 
     render() {
         console.log('render, currentSection:', this.state.currentSection);
