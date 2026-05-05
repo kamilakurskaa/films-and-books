@@ -47,7 +47,23 @@ export class App extends React.Component {
       window.assistant = this.assistant;
 
     this.assistant.on('data', (event) => {
-      console.log(`assistant.on(data)`, event);
+        console.log(`assistant.on(data)`, event);
+        // Обработка навигации с пульта
+        if (event.type === 'navigation' && event.navigation?.command) {
+            const navigationMap = {
+                'UP': 'up',
+                'DOWN': 'down',
+                'LEFT': 'back',
+                'RIGHT': 'forward',
+                'FORWARD': 'forward'
+            };
+
+            const direction = navigationMap[event.navigation.command];
+            if (direction) {
+                this.handleNavigation({ direction });
+                return;
+            }
+        }
       if (event.type === 'character') {
         console.log(`assistant.on(data): character: "${event?.character?.id}"`);
       } else if (event.type === 'insets') {
@@ -136,9 +152,9 @@ export class App extends React.Component {
               this.handleBackButton();
               return true; // Говорим, что мы обработали событие
           });
+
       }
 
-      // Альтернативный способ через ассистента
       if (this.assistant) {
           this.assistant.on('back', () => {
               console.log('Back event from assistant');
@@ -149,6 +165,10 @@ export class App extends React.Component {
         if (this.assistant && this.state.assistantReady) {
             this.sendWelcomeMessage();
         }
+        window.addEventListener('keydown', this.handleKeyDown);
+    }
+    componentWillUnmount() {
+        window.removeEventListener('keydown', this.handleKeyDown);
     }
     sendWelcomeMessage = () => {
         if (!this.assistant) {
@@ -168,26 +188,66 @@ export class App extends React.Component {
         this._send_action_value('welcome', message);
     }
 
-    handleBackButton() {
-        if (this.state.currentSection) {
-            // Если мы в разделе (книги/фильмы) - возвращаемся на главный экран
-            this.setState({
-                currentSection: null,
-                selectedItemId: null,
-                selectedItemTitle: null
-            });
+    handleNavigation = (payload = {}) => {
+        const direction = String(payload.direction || '').toLowerCase();
+        console.log('Navigation direction:', direction);
 
-            // Отправляем ответ ассистенту
-            this._send_action_value('back_to_main', 'Возвращаюсь в главное меню');
+        if (direction === 'back') {
+            const activeElement = document.activeElement;
+            const isInputFocused = activeElement && (
+                activeElement.tagName === 'INPUT' ||
+                activeElement.tagName === 'TEXTAREA' ||
+                activeElement.getAttribute('contenteditable') === 'true'
+            );
 
-            console.log('Back: returned to main screen');
-        } else {
-            // Если мы уже на главном экране - выходим из приложения
-            // Возвращаем false, чтобы устройство обработало выход самостоятельно
-            return false;
+            if (isInputFocused) {
+                activeElement.blur();
+            }
+            // Снимаем выделение с элемента
+            if (this.state.selectedItemId) {
+                this.setState({
+                    selectedItemId: null,
+                    selectedItemTitle: null
+                }, () => {
+                    localStorage.removeItem('media_tracker_selected_id');
+                    localStorage.removeItem('media_tracker_selected_title');
+                });
+                return;
+            }
+
+            // Возврат на главный экран
+            if (this.state.currentSection) {
+                this.setState({
+                    currentSection: null,
+                    selectedItemId: null,
+                    selectedItemTitle: null
+                });
+                return;
+            }
         }
-    }
+    };
+    handleKeyDown = (e) => {
+        const activeElement = document.activeElement;
+        const isInputFocused = activeElement && (
+            activeElement.tagName === 'INPUT' ||
+            activeElement.tagName === 'TEXTAREA' ||
+            activeElement.getAttribute('contenteditable') === 'true'
+        );
 
+        if (isInputFocused) {
+            if (e.key === 'Escape') {
+                activeElement.blur();
+                e.preventDefault();
+                this.handleNavigation({ direction: 'back' });
+            }
+            return;
+        }
+
+        if (e.key === 'Escape' || e.key === 'Backspace' || e.key === 'ArrowLeft') {
+            e.preventDefault();
+            this.handleNavigation({ direction: 'back' });
+        }
+    };
     getStateForAssistant() {
         console.log('getStateForAssistant: this.state:', this.state);
 
