@@ -13,7 +13,7 @@ const initializeAssistant = (getState, getRecoveryState) => {
       getState,                                                                                     
       nativePanel: {
         defaultText: 'добавь книгу',
-        screenshotMode: false,
+          screenshotMode: false,
         tabIndex: -1,
     },
     });
@@ -53,9 +53,10 @@ export class App extends React.Component {
             const navigationMap = {
                 'UP': 'up',
                 'DOWN': 'down',
-                'LEFT': 'back',
-                'RIGHT': 'forward',
-                'FORWARD': 'forward'
+                'LEFT': 'left',
+                'RIGHT': 'right',
+                'FORWARD': 'forward',
+                'BACK': 'back'
             };
 
             const direction = navigationMap[event.navigation.command];
@@ -149,7 +150,6 @@ export class App extends React.Component {
         if (this.assistant) {
             this.assistant.on('back', () => {
                 console.log('Back event from assistant');
-                this.handleNavigation({ direction: 'back' });
             });
         }
 
@@ -158,6 +158,35 @@ export class App extends React.Component {
 
         // Обработка истории браузера
         window.addEventListener('popstate', this.handlePopState);
+
+        if (window.history.pushState && !window.location.pathname.includes('/books') && !window.location.pathname.includes('/movies')) {
+            this.pushHistoryState(null);
+        }
+        if (process.env.NODE_ENV === 'development') {
+            window.testBack = () => {
+                console.log('🧪 TEST: Simulating BACK button');
+                console.log('Current section:', this.state.currentSection);
+                console.log('Selected item:', this.state.selectedItemId);
+
+                // Показываем текущее состояние до навигации
+                const beforeState = {
+                    currentSection: this.state.currentSection,
+                    selectedItemId: this.state.selectedItemId
+                };
+                console.log('Before navigation:', beforeState);
+
+                // Выполняем навигацию
+                this.handleNavigation({ direction: 'back' });
+
+                // Проверяем состояние после (с небольшой задержкой)
+                setTimeout(() => {
+                    console.log('After navigation:', {
+                        currentSection: this.state.currentSection,
+                        selectedItemId: this.state.selectedItemId
+                    });
+                }, 100);
+            };
+        }
     }
     componentWillUnmount() {
         window.removeEventListener('keydown', this.handleKeyDown);
@@ -187,54 +216,95 @@ export class App extends React.Component {
         if (event.state && event.state.fromApp) {
             const targetSection = event.state.section;
 
-            // Возврат на главный экран
-            if (!targetSection && this.state.currentSection) {
-                this.setState({
-                    currentSection: null,
-                    selectedItemId: null,
-                    selectedItemTitle: null
-                });
-                console.log('Popstate: returned to main screen');
+            // Текущий раздел
+            const currentSection = this.state.currentSection;
+
+            // Если целевой раздел совпадает с текущим - ничего не делаем
+            if (targetSection === currentSection) {
+                console.log('Popstate: same section, ignoring');
+                return;
             }
-            // Переключение на раздел
-            else if (targetSection === 'books' && this.state.currentSection !== 'books') {
+
+            // Возврат на главный экран
+            if (!targetSection && currentSection) {
+                console.log('Popstate: navigating back to main screen');
+                // Используем handleNavigation для единообразной обработки
+                this.handleNavigation({ direction: 'back' });
+            }
+            // Переключение на раздел книг
+            else if (targetSection === 'books') {
+                console.log('Popstate: navigating to books');
+                if (currentSection !== 'books') {
+                    this.switch_section({ section: 'books' });
+                }
+            }
+            // Переключение на раздел фильмов
+            else if (targetSection === 'movies') {
+                console.log('Popstate: navigating to movies');
+                if (currentSection !== 'movies') {
+                    this.switch_section({ section: 'movies' });
+                }
+            }
+        } else {
+            // Если событие не от нашего приложения (например, ввод URL вручную)
+            console.log('Popstate: external navigation, checking URL');
+            this.syncSectionFromURL();
+        }
+    };
+    syncSectionFromURL = () => {
+        const path = window.location.pathname;
+
+        if (path === '/books') {
+            if (this.state.currentSection !== 'books') {
                 this.setState({
                     currentSection: 'books',
                     selectedItemId: null,
                     selectedItemTitle: null
                 });
-                console.log('Popstate: switched to books');
             }
-            else if (targetSection === 'movies' && this.state.currentSection !== 'movies') {
+        } else if (path === '/movies') {
+            if (this.state.currentSection !== 'movies') {
                 this.setState({
                     currentSection: 'movies',
                     selectedItemId: null,
                     selectedItemTitle: null
                 });
-                console.log('Popstate: switched to movies');
+            }
+        } else {
+            if (this.state.currentSection !== null) {
+                this.setState({
+                    currentSection: null,
+                    selectedItemId: null,
+                    selectedItemTitle: null
+                });
             }
         }
     };
-    pushHistoryState = (section) => {
+    pushHistoryState = (section, replace = false) => {
         if (window.history.pushState) {
             let url = '/';
             if (section === 'books') url = '/books';
             else if (section === 'movies') url = '/movies';
 
-            window.history.pushState(
-                { section: section, fromApp: true },
-                '',
-                url
-            );
-            console.log('History pushed:', url);
+            const state = { section: section, fromApp: true };
+
+            if (replace) {
+                window.history.replaceState(state, '', url);
+                console.log('History replaced:', url);
+            } else {
+                window.history.pushState(state, '', url);
+                console.log('History pushed:', url);
+            }
         }
     };
     handleNavigation = (payload = {}) => {
-        const direction = String(payload.direction || '').toLowerCase();
-        console.log('Navigation direction:', direction);
+        const direction = String(payload.direction || '').toLowerCase().trim();  // добавил trim()
+        console.log('Navigation direction:', JSON.stringify(direction));
+        console.log('Direction === "back"?', direction === 'back');
 
         if (direction === 'back') {
-            // Убираем фокус с активного поля ввода
+            console.log('✅ ENTERED BACK BLOCK');
+
             const activeElement = document.activeElement;
             const isInputFocused = activeElement && (
                 activeElement.tagName === 'INPUT' ||
@@ -243,13 +313,13 @@ export class App extends React.Component {
             );
 
             if (isInputFocused) {
+                console.log('Input focused, blurring');
                 activeElement.blur();
-                // Не возвращаемся, просто убрали фокус
                 return;
             }
 
-            // Снимаем выделение с элемента
             if (this.state.selectedItemId) {
+                console.log('Clearing selected item');
                 this.setState({
                     selectedItemId: null,
                     selectedItemTitle: null
@@ -257,24 +327,27 @@ export class App extends React.Component {
                     localStorage.removeItem('media_tracker_selected_id');
                     localStorage.removeItem('media_tracker_selected_title');
                 });
-                console.log('Back: cleared selected item');
                 return;
             }
 
-            // Возврат на главный экран (из раздела книг/фильмов)
+            console.log('Current section:', this.state.currentSection);
             if (this.state.currentSection) {
+                console.log('Returning to main screen');
+                this.pushHistoryState(null);
                 this.setState({
                     currentSection: null,
                     selectedItemId: null,
                     selectedItemTitle: null
+                }, () => {
+                    localStorage.removeItem('media_tracker_selected_id');
+                    localStorage.removeItem('media_tracker_selected_title');
                 });
-                console.log('Back: returned to main screen');
                 return;
             }
 
-            // Если уже на главном экране - ничего не делаем,
-            // пусть устройство само обработает выход
-            console.log('Back: already on main screen, exiting');
+            console.log('Already on main screen');
+        } else {
+            console.log('❌ Direction is not "back", it is:', direction);
         }
     };
 
@@ -295,10 +368,11 @@ export class App extends React.Component {
             return;
         }
 
-        if (e.key === 'Escape' || e.key === 'Backspace' || e.key === 'ArrowLeft') {
+        /*if (e.key === 'Escape' || e.key === 'Backspace' || e.key === 'ArrowLeft') {
             e.preventDefault();
             this.handleNavigation({ direction: 'back' });
-        }
+        }*/
+        console.log('Key pressed (ignored):', e.key);
     };
     getStateForAssistant() {
         console.log('getStateForAssistant: this.state:', this.state);
@@ -378,6 +452,9 @@ export class App extends React.Component {
         const targetSection = action.section;
 
         if (targetSection === 'books' || targetSection === 'movies') {
+            if (document.activeElement && document.activeElement.blur) {
+                document.activeElement.blur();
+            }
             this.setState({
                 currentSection: targetSection,
                 selectedItemId: null,

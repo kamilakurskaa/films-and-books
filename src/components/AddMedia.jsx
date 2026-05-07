@@ -36,7 +36,7 @@ export class AddMedia extends React.Component {
                         value={this.state.title}
                         onChange={({ target: { value } }) => this.setState({ title: value })}
                         required
-                        autoFocus
+                        autoFocus={false}
                         style={{ flex: 1 }}
                     />
 
