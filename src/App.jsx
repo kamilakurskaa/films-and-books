@@ -146,29 +146,22 @@ export class App extends React.Component {
     }
 
     componentDidMount() {
-      if (window.smartApp) {
-          window.smartApp.onBackButton(() => {
-              console.log('Back button pressed');
-              this.handleBackButton();
-              return true; // Говорим, что мы обработали событие
-          });
-
-      }
-
-      if (this.assistant) {
-          this.assistant.on('back', () => {
-              console.log('Back event from assistant');
-              this.handleBackButton();
-          });
+        if (this.assistant) {
+            this.assistant.on('back', () => {
+                console.log('Back event from assistant');
+                this.handleNavigation({ direction: 'back' });
+            });
         }
 
-        if (this.assistant && this.state.assistantReady) {
-            this.sendWelcomeMessage();
-        }
+        // Для эмулятора и тестирования на клавиатуре
         window.addEventListener('keydown', this.handleKeyDown);
+
+        // Обработка истории браузера
+        window.addEventListener('popstate', this.handlePopState);
     }
     componentWillUnmount() {
         window.removeEventListener('keydown', this.handleKeyDown);
+        window.removeEventListener('popstate', this.handlePopState);
     }
     sendWelcomeMessage = () => {
         if (!this.assistant) {
@@ -187,12 +180,61 @@ export class App extends React.Component {
         // Отправляем приветствие ассистенту
         this._send_action_value('welcome', message);
     }
+    handlePopState = (event) => {
+        console.log('popstate event:', event.state);
 
+        // Если это наше событие (от pushState)
+        if (event.state && event.state.fromApp) {
+            const targetSection = event.state.section;
+
+            // Возврат на главный экран
+            if (!targetSection && this.state.currentSection) {
+                this.setState({
+                    currentSection: null,
+                    selectedItemId: null,
+                    selectedItemTitle: null
+                });
+                console.log('Popstate: returned to main screen');
+            }
+            // Переключение на раздел
+            else if (targetSection === 'books' && this.state.currentSection !== 'books') {
+                this.setState({
+                    currentSection: 'books',
+                    selectedItemId: null,
+                    selectedItemTitle: null
+                });
+                console.log('Popstate: switched to books');
+            }
+            else if (targetSection === 'movies' && this.state.currentSection !== 'movies') {
+                this.setState({
+                    currentSection: 'movies',
+                    selectedItemId: null,
+                    selectedItemTitle: null
+                });
+                console.log('Popstate: switched to movies');
+            }
+        }
+    };
+    pushHistoryState = (section) => {
+        if (window.history.pushState) {
+            let url = '/';
+            if (section === 'books') url = '/books';
+            else if (section === 'movies') url = '/movies';
+
+            window.history.pushState(
+                { section: section, fromApp: true },
+                '',
+                url
+            );
+            console.log('History pushed:', url);
+        }
+    };
     handleNavigation = (payload = {}) => {
         const direction = String(payload.direction || '').toLowerCase();
         console.log('Navigation direction:', direction);
 
         if (direction === 'back') {
+            // Убираем фокус с активного поля ввода
             const activeElement = document.activeElement;
             const isInputFocused = activeElement && (
                 activeElement.tagName === 'INPUT' ||
@@ -202,7 +244,10 @@ export class App extends React.Component {
 
             if (isInputFocused) {
                 activeElement.blur();
+                // Не возвращаемся, просто убрали фокус
+                return;
             }
+
             // Снимаем выделение с элемента
             if (this.state.selectedItemId) {
                 this.setState({
@@ -212,20 +257,27 @@ export class App extends React.Component {
                     localStorage.removeItem('media_tracker_selected_id');
                     localStorage.removeItem('media_tracker_selected_title');
                 });
+                console.log('Back: cleared selected item');
                 return;
             }
 
-            // Возврат на главный экран
+            // Возврат на главный экран (из раздела книг/фильмов)
             if (this.state.currentSection) {
                 this.setState({
                     currentSection: null,
                     selectedItemId: null,
                     selectedItemTitle: null
                 });
+                console.log('Back: returned to main screen');
                 return;
             }
+
+            // Если уже на главном экране - ничего не делаем,
+            // пусть устройство само обработает выход
+            console.log('Back: already on main screen, exiting');
         }
     };
+
     handleKeyDown = (e) => {
         const activeElement = document.activeElement;
         const isInputFocused = activeElement && (
@@ -332,6 +384,7 @@ export class App extends React.Component {
                 selectedItemTitle: null
             }, () => {
                 localStorage.setItem('media_tracker_current_section', targetSection);
+                this.pushHistoryState(targetSection);
 
                 const sectionName = targetSection === 'books' ? 'книги' : 'фильмы';
                 this._send_action_value('section_switched', `Переключился на раздел ${sectionName}`);
