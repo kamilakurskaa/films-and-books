@@ -703,70 +703,128 @@ export class App extends React.Component {
 
 
     render() {
-        console.log('render, currentSection:', this.state.currentSection);
+        try {
+            console.log('render, currentSection:', this.state.currentSection);
 
-        // Если раздел не выбран, показываем приветственный экран
-        if (!this.state.currentSection) {
+            // Если раздел не выбран, показываем приветственный экран
+            if (!this.state.currentSection) {
+                return (
+                    <WelcomeScreen
+                        onSelectSection={(section) => {
+                            console.log('Selected section:', section);
+                            this.setState({
+                                currentSection: section,
+                                selectedItemId: null,
+                                selectedItemTitle: null
+                            });
+                        }}
+                    />
+                );
+            }
+
+            const currentItems = this.getCurrentItems();
+            const sectionTitle = this.state.currentSection === 'books' ? 'Книги' : 'Фильмы';
+
             return (
-                <WelcomeScreen
-                    onSelectSection={(section) => {
-                        console.log('Selected section:', section);
-                        this.setState({
-                            currentSection: section,
-                            selectedItemId: null,
-                            selectedItemTitle: null
-                        });
-                    }}
-                />
+                <div className="container">
+                    <div className="section-header">
+                        <button
+                            className="back-btn"
+                            onClick={() => this.setState({
+                                currentSection: null,
+                                selectedItemId: null,
+                                selectedItemTitle: null
+                            })}
+                        >
+                            ← Назад
+                        </button>
+                        <h1 className="section-title">{sectionTitle}</h1>
+                        {currentItems.length > 0 && (
+                            <button className="clear-all-btn" onClick={this.clear_all_items}>
+                                🗑️
+                            </button>
+                        )}
+                    </div>
+
+                    <MediaList
+                        items={currentItems}
+                        selectedItemId={this.state.selectedItemId}
+                        onAdd={(title, mediaType) => {
+                            this.add_media({ type: 'add_media', title, mediaType });
+                        }}
+                        onSelectItem={(item) => {
+                            console.log('Manual select item:', item);
+                            this.select_item({ type: 'select_item', id: item.id, title: item.title });
+                        }}
+                        onDelete={(item) => {
+                            this.delete_media({ type: 'delete_media', id: item.id });
+                        }}
+                        onRate={(item, rating) => {
+                            this.rate_media({ type: 'rate_media', id: item.id, rating });
+                        }}
+                        onReview={(item, review) => {
+                            this.review_media({ type: 'review_media', id: item.id, review });
+                        }}
+                        onClearAll={this.clear_all_items}
+                    />
+                </div>
+            );
+        } catch (error) {
+            console.error('RENDER ERROR:', error);
+            // Показываем ошибку на экране (тестировщик увидит)
+            return (
+                <div style={{
+                    padding: '20px',
+                    color: 'red',
+                    fontFamily: 'monospace',
+                    backgroundColor: '#ffeeee',
+                    minHeight: '100vh'
+                }}>
+                    <h2>Ошибка в приложении</h2>
+                    <p><strong>{error.message}</strong></p>
+                    <details>
+                        <summary>Подробности</summary>
+                        <pre style={{ fontSize: '12px', overflow: 'auto' }}>
+                            {error.stack}
+                        </pre>
+                    </details>
+                    <button
+                        onClick={() => {
+                            localStorage.clear();
+                            window.location.reload();
+                        }}
+                        style={{
+                            marginTop: '20px',
+                            padding: '10px 20px',
+                            backgroundColor: '#1a5d2e',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        🗑️ Очистить данные и перезагрузить
+                    </button>
+                    <button
+                        onClick={() => {
+                            this.setState({ currentSection: null });
+                        }}
+                        style={{
+                            marginTop: '20px',
+                            marginLeft: '10px',
+                            padding: '10px 20px',
+                            backgroundColor: '#666',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        ⬅️ На главный экран
+                    </button>
+                </div>
             );
         }
-
-        const currentItems = this.getCurrentItems();
-        const sectionTitle = this.state.currentSection === 'books' ? 'Книги' : 'Фильмы';
-
-        return (
-            <div className="container">
-                <div className="section-header">
-                    <button
-                        className="back-btn"
-                        onClick={() => this.setState({
-                            currentSection: null,
-                            selectedItemId: null,
-                            selectedItemTitle: null
-                        })}
-                    >
-                        ← Назад
-                    </button>
-                    <h1 className="section-title">{sectionTitle}</h1>
-                    {currentItems.length > 0 && (
-                        <button className="clear-all-btn" onClick={this.clear_all_items}>
-                            🗑️
-                        </button>
-                    )}
-                </div>
-
-                <MediaList
-                    items={currentItems}
-                    selectedItemId={this.state.selectedItemId}
-                    onAdd={(title, mediaType) => {
-                        this.add_media({ type: 'add_media', title, mediaType });
-                    }}
-                    onSelectItem={(item) => {  
-                        console.log('Manual select item:', item);
-                        this.select_item({ type: 'select_item', id: item.id, title: item.title });
-                    }}
-                    onDelete={(item) => {
-                        this.delete_media({ type: 'delete_media', id: item.id });
-                    }}
-                    onRate={(item, rating) => {
-                        this.rate_media({ type: 'rate_media', id: item.id, rating });
-                    }}
-                    onReview={(item, review) => {
-                        this.review_media({ type: 'review_media', id: item.id, review });
-                    }}
-                    onClearAll={this.clear_all_items}
-                />
-            </div>
-        );
+        
     }
 }
