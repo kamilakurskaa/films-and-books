@@ -4,15 +4,17 @@ body {
     margin: 0;
     padding: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
+/* ========== ДЕСКТОПНЫЕ СТИЛИ (БАЗОВЫЕ, ВНЕ МЕДИА-ЗАПРОСОВ) ========== */
 .container {
     margin: 0 auto;
     max-width: 1200px;
     padding: 0 48px;
 }
 
-/* Заголовок страницы (Книги/Фильмы) */
 .section-title {
     font-size: 48px;
     font-weight: bold;
@@ -22,7 +24,6 @@ body {
     text-align: center;
 }
 
-/* Контейнер для формы добавления */
 .add-form {
     display: flex;
     gap: 12px;
@@ -30,7 +31,6 @@ body {
     align-items: center;
 }
 
-/* Поле ввода */
 .add-task {
     flex: 1;
     background-color: #f0f8e8;
@@ -53,25 +53,6 @@ body {
         color: #b0c4b0;
     }
 
-/* Выпадающий список */
-.media-type-select {
-    background-color: #f0f8e8;
-    border: 2px solid #2e8b57;
-    padding: 16px 24px;
-    font-size: 24px;
-    border-radius: 64px;
-    color: #f0f8e8;
-    cursor: pointer;
-    outline: none;
-    transition: all 0.3s ease;
-}
-
-    .media-type-select:focus {
-        border-color: #236b43;
-        box-shadow: 0 0 0 3px rgba(46, 139, 86, 0.15);
-    }
-
-/* Кнопка добавления */
 .add-btn {
     background-color: #2e8b57 !important;
     border: none;
@@ -93,7 +74,6 @@ body {
         transform: scale(1.02);
     }
 
-/* Элемент списка (карточка) */
 .task-item {
     margin-bottom: 24px;
     border-radius: 24px;
@@ -113,20 +93,17 @@ body {
         border-color: #236b43;
     }
 
-/* Контент внутри карточки */
 .task-content {
     flex: 1;
 }
 
-/* Верхняя строка карточки */
 .task-header {
     display: flex;
     align-items: center;
     gap: 16px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
-/* Номер элемента */
 .task-number {
     font-weight: bold;
     font-size: 28px;
@@ -134,12 +111,10 @@ body {
     min-width: 40px;
 }
 
-/* Иконка типа */
 .task-icon {
     font-size: 32px;
 }
 
-/* Название элемента */
 .task-title {
     font-size: 28px;
     font-weight: 500;
@@ -147,7 +122,6 @@ body {
     flex: 1;
 }
 
-/* Кнопка удаления */
 .delete-btn {
     background-color: #236b43;
     border: none;
@@ -164,13 +138,12 @@ body {
         transform: translateY(-1px);
     }
 
-/* Кнопка отзыва  */
 .review-btn {
     background-color: #98FB98;
     border: none;
     border-radius: 16px;
     padding: 8px 20px;
-    color: white;
+    color: #1a5d2e;
     cursor: pointer;
     font-size: 18px;
     transition: all 0.2s;
@@ -179,9 +152,9 @@ body {
     .review-btn:hover {
         background-color: #236b43;
         transform: translateY(-1px);
+        color: white;
     }
 
-/* Кнопка "Назад" */
 .back-btn {
     background-color: #1a5d2e;
     border: none;
@@ -198,7 +171,6 @@ body {
         transform: translateX(-3px);
     }
 
-/* Кнопка очистки всех */
 .clear-all-btn {
     height: 72px;
     width: 72px;
@@ -222,14 +194,12 @@ body {
         transform: scale(1.05);
     }
 
-/* Контейнер для списка */
 .notes {
     margin: 36px 0 144px;
     padding: 0;
     list-style: none;
 }
 
-/* Отзыв внутри карточки */
 .review-text {
     margin-top: 16px;
     padding: 12px 20px;
@@ -241,52 +211,60 @@ body {
     color: #1a5d2e;
 }
 
-/* Заголовок раздела */
 .section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin: 32px 0;
     gap: 20px;
+    flex-wrap: nowrap;
 }
 
-/* Адаптивность */
+/* ========== МОБИЛЬНЫЕ СТИЛИ (ТОЛЬКО ДЛЯ ЭКРАНОВ МЕНЬШЕ 768px) ========== */
 @media (max-width: 768px) {
     .container {
         padding: 0 16px;
     }
 
-    /* Карточка элемента */
+    .section-title {
+        font-size: 28px;
+    }
+
+    .section-header {
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 16px 0;
+    }
+
+    .back-btn {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    .clear-all-btn {
+        height: 40px;
+        width: 40px;
+        font-size: 20px;
+        margin-top: 0;
+    }
+
     .task-item {
         padding: 12px 16px;
         margin-bottom: 16px;
     }
 
-    /* Контент внутри карточки */
     .task-content {
         width: 100%;
     }
 
-    /* Верхняя строка карточки - теперь вертикальная на телефонах */
     .task-header {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-wrap: wrap;
         gap: 8px;
     }
 
-    /* Номер элемента */
     .task-number {
         font-size: 18px;
         min-width: auto;
-    }
-
-    /* Иконка и название в одной строке */
-    .task-title-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex-wrap: wrap;
-        width: 100%;
     }
 
     .task-icon {
@@ -295,14 +273,9 @@ body {
 
     .task-title {
         font-size: 18px;
-        word-break: break-word;
-        flex: 1;
     }
 
-    /* Кнопки действий */
     .task-actions {
-        display: flex;
-        gap: 8px;
         margin-top: 8px;
         width: 100%;
         justify-content: flex-end;
@@ -314,17 +287,12 @@ body {
         font-size: 14px;
     }
 
-    /* Рейтинг звёздами */
-    .star-rating {
-        display: flex;
-        gap: 4px;
+    .review-text {
+        font-size: 14px;
+        padding: 8px 12px;
+        margin-top: 12px;
     }
 
-        .star-rating span {
-            font-size: 24px !important;
-        }
-
-    /* Форма добавления */
     .add-form {
         flex-direction: column;
         gap: 8px;
@@ -337,55 +305,16 @@ body {
         width: 100%;
     }
 
-    .media-type-select {
-        width: 100%;
-        font-size: 16px;
-        padding: 12px 20px;
-    }
-
     .add-btn {
         width: 100%;
         padding: 12px 20px;
         font-size: 20px;
     }
-
-    /* Заголовок секции */
-    .section-header {
-        flex-wrap: wrap;
-        gap: 12px;
-        margin: 16px 0;
-    }
-
-    .section-title {
-        font-size: 28px;
-        order: 1;
-        text-align: center;
-        width: 100%;
-    }
-
-    .back-btn {
-        order: 0;
-        padding: 8px 16px;
-        font-size: 14px;
-    }
-
-    .clear-all-btn {
-        order: 2;
-        height: 40px;
-        width: 40px;
-        font-size: 20px;
-        margin-top: 0;
-    }
-
-    /* Отзыв */
-    .review-text {
-        font-size: 14px;
-        padding: 8px 12px;
-        margin-top: 12px;
-    }
 }
+
+/* ========== СВЕРХ МАЛЕНЬКИЕ ЭКРАНЫ ========== */
 @media (max-width: 480px) {
-    .task-title-wrapper {
+    .task-header {
         flex-direction: column;
         align-items: flex-start;
     }
