@@ -101,11 +101,25 @@ export class App extends React.Component {
             const saved = localStorage.getItem(key);
             if (saved) {
                 const items = JSON.parse(saved);
-                console.log('Loaded from storage:', key, items.length, 'items');
-                return items;
+                const validItems = Array.isArray(items) ? items.filter(item =>
+                    item &&
+                    typeof item === 'object' &&
+                    item.id &&
+                    typeof item.id === 'string' &&
+                    item.title &&
+                    typeof item.title === 'string'
+                ) : [];
+
+                if (validItems.length !== items?.length) {
+                    console.warn(`Found ${items?.length - validItems.length} invalid items in ${key}, cleaning...`);
+                    localStorage.setItem(key, JSON.stringify(validItems));
+                }
+                console.log('Loaded from storage:', key, validItems.length, 'items');
+                return validItems;
             }
         } catch (error) {
             console.error('Error loading from storage:', error);
+            localStorage.removeItem(key);
         }
         return [];
     }
@@ -134,7 +148,7 @@ export class App extends React.Component {
             console.log('State after update -', stateField, ':', this.state[stateField]);
 
             // Принудительное обновление
-            this.forceUpdate();
+            ///this.forceUpdate();
         });
     }
 

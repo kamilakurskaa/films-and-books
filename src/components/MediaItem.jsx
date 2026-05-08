@@ -57,8 +57,8 @@ export class MediaItem extends React.Component {
                     transition: 'all 0.2s',
                 }}
             >
-                <div classname="task-content">
-                    <div classname="task-header">
+                <div className="task-content">
+                    <div className="task-header">
                         <span className="task-number">
                             {index + 1}.
                         </span>
