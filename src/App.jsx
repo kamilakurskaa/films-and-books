@@ -317,7 +317,7 @@ export class App extends React.Component {
         console.log('Direction === "back"?', direction === 'back');
 
         if (direction === 'back') {
-            console.log('✅ ENTERED BACK BLOCK');
+            console.log('ENTERED BACK BLOCK');
 
             const activeElement = document.activeElement;
             const isInputFocused = activeElement && (
@@ -361,7 +361,7 @@ export class App extends React.Component {
 
             console.log('Already on main screen');
         } else {
-            console.log('❌ Direction is not "back", it is:', direction);
+            console.log('Direction is not "back", it is:', direction);
         }
     };
 
@@ -771,7 +771,7 @@ export class App extends React.Component {
             );
         } catch (error) {
             console.error('RENDER ERROR:', error);
-            // Показываем ошибку на экране (тестировщик увидит)
+            // Показываем ошибку на экране
             return (
                 <div style={{
                     padding: '20px',
