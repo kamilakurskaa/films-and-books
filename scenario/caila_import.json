@@ -1,7 +1,7 @@
 {
   "project" : {
-    "id" : "my_canvas_test-17154-AnE",
-    "name" : "my_canvas_test-17154-AnE",
+    "id" : "treker_knig_i_fil_mo-9428513-xHp",
+    "name" : "treker_knig_i_fil_mo-9428513-xHp",
     "folder" : "/jaicp"
   },
   "settings" : {
@@ -9,6 +9,7 @@
     "spellingCorrection" : false,
     "classificationAlgorithm" : "sts",
     "timezone" : "UTC",
+    "shared" : false,
     "businessShared" : false,
     "business" : false
   },

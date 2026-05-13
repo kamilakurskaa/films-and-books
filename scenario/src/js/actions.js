@@ -28,3 +28,24 @@ function reviewMedia(id, review, context) {
         review: review
     }, context);
 }
+
+function selectMedia(id, title, context){
+    addAction({
+        type: "select_item",
+        id: id,
+        title: title
+    }, context);
+}
+
+function switchSection(section, context){
+    addAction({
+        type: "switch_section",
+        section: section
+    }, context);
+}
+
+function goToMain(context){
+    addAction({
+        type: "go_to_main"
+    }, context);
+}
